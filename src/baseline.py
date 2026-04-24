@@ -9,12 +9,12 @@ import numpy as np
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_absolute_percentage_error, mean_absolute_error, mean_squared_error
 
-def run_system_experiment(
+def run_baseline_experiment(
         dataset_path: str,
-        num_repeats: int = 3,
+        num_repeats: int = 30,
         train_frac: float = 0.7,
         random_seed: int = 1
-) -> dict:
+) -> tuple[dict,dict]:
     """
     Runs baseline experiments on a single dataset
     """
@@ -22,8 +22,8 @@ def run_system_experiment(
     # Load data
     data = pd.read_csv(dataset_path)
 
-    # Store metrics for repeats
-    metrics = {'MAPE': [], 'MAE': [], 'RMSE': []}
+    # Store raw metrics for repeats
+    raw_metrics = {'MAPE': [], 'MAE': [], 'RMSE': []}
 
     # Repeats
     for rep in range(num_repeats):
@@ -42,31 +42,31 @@ def run_system_experiment(
         model.fit(X_train, y_train)
         y_pred = model.predict(X_test)
 
-        # Calculate evaluation metrics
+        # Calculate evaluation raw metrics
         mape = mean_absolute_percentage_error(y_test, y_pred)
         mae = mean_absolute_error(y_test, y_pred)
         rmse = np.sqrt(mean_squared_error(y_test, y_pred))
 
-        # Store metrics
-        metrics['MAPE'].append(mape)
-        metrics['MAE'].append(mae)
-        metrics['RMSE'].append(rmse)
+        # Store raw metrics
+        raw_metrics['MAPE'].append(mape)
+        raw_metrics['MAE'].append(mae)
+        raw_metrics['RMSE'].append(rmse)
 
     # Calculate averages
     avg_metrics = {
-        'MAPE_avg': np.mean(metrics['MAPE']),
-        'MAE_avg': np.mean(metrics['MAE']),
-        'RMSE_avg': np.mean(metrics['RMSE']),
-        'MAPE_std': np.std(metrics['MAPE']),
-        'MAE_std': np.std(metrics['MAE']),
-        'RMSE_std': np.std(metrics['RMSE']),
+        'MAPE_avg': np.mean(raw_metrics['MAPE']),
+        'MAE_avg': np.mean(raw_metrics['MAE']),
+        'RMSE_avg': np.mean(raw_metrics['RMSE']),
+        'MAPE_std': np.std(raw_metrics['MAPE']),
+        'MAE_std': np.std(raw_metrics['MAE']),
+        'RMSE_std': np.std(raw_metrics['RMSE']),
         'num_repeats': num_repeats
     }
 
-    return avg_metrics
+    return avg_metrics, raw_metrics
 
 
-def run_all_system_experiments(
+def run_all_baseline_experiments(
         system_list: list,
         datasets_dir: str = '../data/datasets/',
         output_dir: str = '../data/results/baseline/'
@@ -76,7 +76,8 @@ def run_all_system_experiments(
     """
 
     os.makedirs(output_dir, exist_ok=True)
-    results = []
+    summary_results = []
+    raw_results = []
 
     for system in system_list:
         system_dir = os.path.join(datasets_dir, system)
@@ -85,24 +86,39 @@ def run_all_system_experiments(
         for csv_file in csv_files:
             print(f"\nProcessing: {system} - {os.path.basename(csv_file)}")
 
-            avg_metrics = run_system_experiment(csv_file)
+            avg_metrics, raw_metrics = run_baseline_experiment(csv_file)
 
-            # Store results
+            # Store summary results
             result = {
                 'system': system,
                 'dataset': os.path.basename(csv_file),
                 **avg_metrics
             }
-            results.append(result)
+            summary_results.append(result)
 
-    results_df = pd.DataFrame(results)
-    results_df.to_csv(os.path.join(output_dir, 'baseline_results.csv'), index=False)
+            # Store raw per-repeat results
+            for rep_idx in range(len(raw_metrics['MAPE'])):
+                raw_results.append({
+                    'system': system,
+                    'dataset': os.path.basename(csv_file),
+                    'repeat': rep_idx,
+                    'MAPE': raw_metrics['MAPE'][rep_idx],
+                    'MAE': raw_metrics['MAE'][rep_idx],
+                    'RMSE': raw_metrics['RMSE'][rep_idx]
+                })
 
-    return results_df
+    summary_df = pd.DataFrame(summary_results)
+    summary_df.to_csv(os.path.join(output_dir, 'baseline_summary.csv'), index=False)
+
+    raw_df = pd.DataFrame(raw_results)
+    raw_df.to_csv(os.path.join(output_dir, 'baseline_raw.csv'), index=False)
+
+    return summary_df
+
 
 if __name__ == '__main__':
     systems = ['batlik','dconvert','h2','jump3r','kanzi','lrzip','x264','xz','z3']
 
-    experiment_results = run_all_system_experiments(systems)
+    experiment_results = run_all_baseline_experiments(systems)
     print("\n=== Baseline Experiments Complete ===")
-    print("Results saved to: data/results/baseline/baseline_results.csv")
+    print("Results saved to: data/results/baseline/")

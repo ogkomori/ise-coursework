@@ -22,12 +22,6 @@ env/
 .DS_Store
 Thumbs.db
 
-# Project specific
-results/
-figures/
-*.csv
-!data/**/*.csv
-
 # Jupyter
 .ipynb_checkpoints/
 
