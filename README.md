@@ -38,8 +38,8 @@ Random Forest significantly outperforms the baseline across all three metrics (p
 ## Quick Start
 
 ```bash
-git clone https://github.com/ogkomori/ise-coursework.git
-cd ise-coursework
+git clone https://github.com/ogkomori/configuration-performance-learning.git
+cd configuration-performance-learning
 pip install -r requirements.txt
 
 python src/baseline.py
