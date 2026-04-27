@@ -9,6 +9,8 @@ import numpy as np
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_absolute_percentage_error, mean_absolute_error, mean_squared_error
 
+OUTPUT_DIRECTORY = '../data/results/baseline/'
+
 def run_baseline_experiment(
         dataset_path: str,
         num_repeats: int = 30,
@@ -69,7 +71,7 @@ def run_baseline_experiment(
 def run_all_baseline_experiments(
         system_list: list,
         datasets_dir: str = '../data/datasets/',
-        output_dir: str = '../data/results/baseline/'
+        output_dir: str = OUTPUT_DIRECTORY
 ) -> pd.DataFrame:
     """
     Runs baseline experiments on all datasets
@@ -121,4 +123,4 @@ if __name__ == '__main__':
 
     experiment_results = run_all_baseline_experiments(systems)
     print("\n=== Baseline Experiments Complete ===")
-    print("Results saved to: data/results/baseline/")
+    print(f"Results saved to: {OUTPUT_DIRECTORY}")

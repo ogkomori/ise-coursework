@@ -11,6 +11,8 @@ from sklearn.ensemble import RandomForestRegressor
 from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import mean_absolute_percentage_error, mean_absolute_error, mean_squared_error
 
+OUTPUT_DIRECTORY = '../data/results/random_forest/'
+
 def run_random_forest_experiment(
         dataset_path: str,
         num_repeats: int = 30,
@@ -92,7 +94,7 @@ def run_random_forest_experiment(
 def run_all_random_forests(
         system_list: list,
         datasets_dir: str = '../data/datasets/',
-        output_dir: str = '../data/results/random_forest/'
+        output_dir: str = OUTPUT_DIRECTORY
 ):
     """
     Run random forest experiments on all datasets
@@ -144,4 +146,4 @@ if __name__ == '__main__':
 
     experiment_results = run_all_random_forests(systems)
     print("\n=== Random Forest Experiments Complete ===")
-    print("Results saved to: data/results/random_forest/")
+    print(f"Results saved to: {OUTPUT_DIRECTORY}")

@@ -71,10 +71,9 @@ def run_statistical_comparison(
         output_dir: str = OUTPUT_DIRECTORY
 ) -> pd.DataFrame:
     """
-    Performs statistical tests comparing baseline vs RF
+    Performs statistical tests comparing baseline vs Random Forest
     """
 
-    print("Starting statistical comparison")
     os.makedirs(output_dir, exist_ok=True)
     results = {}
 
@@ -137,7 +136,6 @@ def create_comparison_table(
     Creates summary comparison table
     """
 
-    print("Starting comparison table")
     os.makedirs(output_dir, exist_ok=True)
     summary = []
 

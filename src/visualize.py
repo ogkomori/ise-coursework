@@ -1,6 +1,5 @@
 """
-Create publication-quality figures for the report
-NO SCREENSHOTS - only proper matplotlib/seaborn plots
+Create figures for the evaluation results
 """
 
 import pandas as pd
@@ -9,7 +8,6 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import os
 
-# Set publication style
 plt.style.use('seaborn-v0_8-paper')
 sns.set_palette("Set2")
 plt.rcParams['figure.dpi'] = 300
@@ -17,10 +15,11 @@ plt.rcParams['font.size'] = 10
 plt.rcParams['font.family'] = 'serif'
 
 OUTPUT_DIRECTORY = '../figures'
+COMPARISON_TABLE_PATH = '../data/results/evaluation/comparison_table.csv'
 
 def plot_metric_comparison_boxplot(merged_df, metric='MAPE', output_dir=OUTPUT_DIRECTORY):
   """
-  Create box plot comparing baseline vs RF for a specific metric
+  Create box plot comparing baseline vs Random Forest for a specific metric
   """
   os.makedirs(output_dir, exist_ok=True)
 
@@ -42,7 +41,6 @@ def plot_metric_comparison_boxplot(merged_df, metric='MAPE', output_dir=OUTPUT_D
     widths=0.6
   )
 
-  # Customize colors
   colors = ['#FF9999', '#66B2FF']
   for patch, color in zip(bp['boxes'], colors):
     patch.set_facecolor(color)
@@ -100,8 +98,7 @@ def plot_improvement_bar_chart(merged_df, output_dir=OUTPUT_DIRECTORY):
 
 def plot_scatter_comparison(merged_df, metric='MAPE', output_dir=OUTPUT_DIRECTORY):
   """
-  Create scatter plot showing baseline vs RF performance
-  Points below diagonal = RF is better
+  Create scatter plot showing baseline vs Random Forest performance
   """
   os.makedirs(output_dir, exist_ok=True)
 
@@ -155,7 +152,7 @@ def create_all_figures(merged_df):
 
 if __name__ == "__main__":
   # Load merged results
-  df = pd.read_csv('../data/results/evaluation/comparison_table.csv')
+  df = pd.read_csv(COMPARISON_TABLE_PATH)
   for m in ['MAPE', 'MAE', 'RMSE']:
     df[f'{m}_Baseline'] = df[f'{m}_Baseline'].astype(float)
     df[f'{m}_RF'] = df[f'{m}_RF'].astype(float)
